@@ -1,0 +1,16 @@
+[submodule "miniupnp"]
+	path = miniupnp
+	url = https://github.com/miniupnp/miniupnp.git
+[submodule "lmdb"]
+	path = lmdb
+	url = https://github.com/xpeedcurrency/lmdb.git
+	branch = lmdb_0_9_23
+[submodule "crypto/cryptopp"]
+	path = crypto/cryptopp
+	url = https://github.com/weidai11/cryptopp.git
+[submodule "crypto/phc-winner-argon2"]
+	path = crypto/phc-winner-argon2
+	url = https://github.com/xpeedcurrency/phc-winner-argon2.git
+[submodule "crypto/xxhash"]
+	path = crypto/xxhash
+	url = https://github.com/Cyan4973/xxHash.git

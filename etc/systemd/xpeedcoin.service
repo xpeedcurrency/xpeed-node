@@ -1,0 +1,13 @@
+[Unit]
+Description=Xpeed Daemon live network
+After=network.target
+
+[Service]
+Type=simple
+User=xpeedcoin
+WorkingDirectory=/var/xpeedcoin/Xpeed
+ExecStart=/usr/bin/xpd_node --daemon
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

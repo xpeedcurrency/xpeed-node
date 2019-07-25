@@ -1,0 +1,41 @@
+## Xpeed CI config
+
+image: ubuntu:xenial
+
+stages:
+  - build
+
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+.linux_template: &linux_cfg
+  variables:
+    BOOST_ROOT: /usr/local/boost
+    CC: clang
+    CXX: clang++
+
+  artifacts:
+    expire_in: 2d
+    paths:
+    - build*/*.tar*
+    - build*/*_test
+    - csa_results
+    - build*/SHA1SUMS
+
+  script:
+    - chmod 755 ./ci/build-gitlab.sh
+    - ./ci/build-gitlab.sh
+
+
+
+Ubuntu Linux Xenial:
+  <<: *linux_cfg
+  stage: build
+  image: ubuntu:xenial
+  variables:
+    FLAVOR: xenial
+
+  before_script:
+    - chmod 755 ./util/build_prep/update-common
+    - ./util/build_prep/update-common
+    - ./util/build_prep/update-common && ./util/build_prep/ubuntu/prep.sh

@@ -1,0 +1,13 @@
+[Unit]
+Description=Xpeed Daemon beta network
+After=network.target
+
+[Service]
+Type=simple
+User=xpeedcoin
+WorkingDirectory=/var/xpeedcoin/XpeedBeta
+ExecStart=/usr/bin/xpd_node-beta --daemon
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target

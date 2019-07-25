@@ -1,0 +1,63 @@
+Name:                   xpeedcoin-beta
+Version:                @VERSION@ 
+Release:                @RELEASE@%{?dist}
+Summary:                Xpeedcurrency Beta Daemon
+License:                BSD-2-Clause
+URL:                    https://xpeedcoin.com/
+Requires(pre):          /usr/sbin/useradd, /usr/bin/getent
+Requires(postun):       /usr/sbin/userdel
+BuildRequires:          make, libstdc++-static, glibc-devel, glibc-headers
+Source:                 xpeed-%{version}.tar.gz
+
+%description
+This is xpeedcoin daemon.  Xpeed is a digital currency that is
+peer-to-peer, decentralized, and trustless. This package includes
+the xpeed daemon, and a service.
+
+%prep
+if [ ! -x "$(which cmake)" ]; then
+	echo "cmake must exist, try:" >&2
+	echo "      scl enable llvm-toolset-7 devtoolset-7 'rpmbuild ...'" >&2
+	exit 1
+fi
+if cc --std=c++14 --version 2>&1 >/dev/null | grep '^' >/dev/null; then
+	echo "Unsupported C++ compiler, try:" >&2
+	echo "      scl enable llvm-toolset-7 devtoolset-7 'rpmbuild ...'" >&2
+	exit 1
+fi
+if test ! -d /usr/local/boost; then
+	echo "Boost should be in /usr/local/boost" >&2
+	exit 1
+fi
+%autosetup -n xpeed-%{version}
+
+%build
+cmake -DCMAKE_VERBOSE_MAKEFILE=ON -DBOOST_ROOT=/usr/local/boost -DACTIVE_NETWORK=xpd_beta_network .
+make xpd_node %{?_smp_mflags}
+
+%install
+if [ ! %{buildroot} = "/" ]; then %{__rm} -rf %{buildroot}; fi
+mkdir -p %{buildroot}/usr/bin
+mkdir -p %{buildroot}/etc/systemd/system/
+cp xpd_node %{buildroot}/usr/bin/xpd_node-beta
+cp etc/systemd/xpeedcoin-beta.service %{buildroot}/etc/systemd/system/xpeedcoin-beta.service
+
+%clean
+if [ ! %{buildroot} = "/" ]; then %{__rm} -rf %{buildroot}; fi
+
+%files
+%defattr(755,root,root)
+%{_bindir}/xpd_node-beta
+%attr(644,root,root) /etc/systemd/system/xpeedcoin-beta.service
+
+%pre
+PATH="/usr/bin:/usr/sbin:/bin:/sbin:${PATH}"; export PATH
+mkdir -p /var/xpeedcoin/XpeedBeta
+getent group xpeedcoin >/dev/null || groupadd --system xpeedcoin || exit 1
+getent passwd xpeedcoin >/dev/null || useradd --system --create-home --home-dir /var/xpeedcoin --shell /bin/bash --comment "xpeedcoin Daemon user" --gid xpeedcoin xpeedcoin || exit 1
+chown -R xpeedcoin:xpeedcoin /var/xpeedcoin
+chmod 700 /var/xpeedcoin
+
+%postun
+PATH="/usr/bin:/usr/sbin:/bin:/sbin:${PATH}"; export PATH
+userdel xpeedcoin >/dev/null 2>/dev/null || :
