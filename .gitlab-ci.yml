@@ -14,6 +14,10 @@ variables:
     CC: clang
     CXX: clang++
 
+  only:
+    refs:
+      - master
+
   artifacts:
     expire_in: 2d
     paths:
